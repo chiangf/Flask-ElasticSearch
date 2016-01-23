@@ -17,7 +17,7 @@ class FlaskElasticsearch(object):
             self.init_app(app, **kwargs)
 
     def init_app(self, app, **kwargs):
-        app.config.setdefault('ELASTICSEARCH_HOST', 'localhost:9200')
+        app.config.setdefault('ELASTICSEARCH_HOST', ['localhost:9200'])
         app.config.setdefault('ELASTICSEARCH_HTTP_AUTH', None)
 
         self.elasticsearch_options = kwargs
@@ -33,7 +33,7 @@ class FlaskElasticsearch(object):
         ctx = stack.top
         if ctx is not None:
             if not hasattr(ctx, 'elasticsearch'):
-                ctx.elasticsearch = Elasticsearch(hosts=[ctx.app.config.get('ELASTICSEARCH_HOST')],
+                ctx.elasticsearch = Elasticsearch(hosts=ctx.app.config.get('ELASTICSEARCH_HOST'),
                                                   http_auth=ctx.app.config.get('ELASTICSEARCH_HTTP_AUTH'),
                                                   **self.elasticsearch_options)
 
