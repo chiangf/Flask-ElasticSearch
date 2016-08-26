@@ -1,4 +1,5 @@
 from elasticsearch import Elasticsearch
+from elasticmock import FakeElasticsearch
 
 
 # Find the stack on which we want to store the database connection.
@@ -37,9 +38,14 @@ class FlaskElasticsearch(object):
                     hosts = [ctx.app.config.get('ELASTICSEARCH_HOST')]
                 elif isinstance(ctx.app.config.get('ELASTICSEARCH_HOST'), list):
                     hosts = ctx.app.config.get('ELASTICSEARCH_HOST')
-                ctx.elasticsearch = Elasticsearch(hosts=hosts,
-                                                  http_auth=ctx.app.config.get('ELASTICSEARCH_HTTP_AUTH'),
-                                                  **self.elasticsearch_options)
+                
+                if ctx.app.config["TESTING"]:
+                    ctx.elasticsearch = FakeElasticsearch()
+                
+                else:
+                    ctx.elasticsearch = Elasticsearch(hosts=hosts,
+                                                      http_auth=ctx.app.config.get('ELASTICSEARCH_HTTP_AUTH'),
+                                                      **self.elasticsearch_options)
 
             return getattr(ctx.elasticsearch, item)
 
